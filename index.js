@@ -20,8 +20,8 @@ connectDB();
 //user Routes
 app.use("/api", userRoutes);
 app.get("/check-me", (_, res) => {
-    res.json({ message: `Hello World!` });
+  res.json({ message: `Hello World!` });
 });
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 app.listen(port, () => console.log(`Server running on port ${port}`));
