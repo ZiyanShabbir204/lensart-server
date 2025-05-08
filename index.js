@@ -3,6 +3,7 @@ import cors from "cors";
 import connectDB from "./config/db.js";
 import dotenv from "dotenv";
 import userRoutes from "./routes/userRoutes.js";
+import modelRoutes from "./routes/modelRoutes.js";
 import cookieParser from "cookie-parser";
 
 dotenv.config();
@@ -19,6 +20,7 @@ connectDB();
 
 //user Routes
 app.use("/api", userRoutes);
+app.use("/api", modelRoutes);
 app.get("/check-me", (_, res) => {
   res.json({ message: `Hello World!` });
 });
