@@ -39,3 +39,23 @@ export const getUserModels = async (req, res) => {
     res.status(500).json({ message: "Server error while fetching data." });
   }
 };
+
+export const getModelById = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+
+    const model = await Model.findOne({ _id: id, userId });
+
+    if (!model) {
+      return res
+        .status(404)
+        .json({ message: "Model not found or access denied." });
+    }
+
+    res.status(200).json({ data: model });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error while fetching model." });
+  }
+};
