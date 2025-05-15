@@ -2,7 +2,7 @@ import Model from "../models/Model.js";
 
 export const saveModelinDB = async (req, res) => {
   try {
-    const { imageUrl, qrUrl, modelUrl } = req.body;
+    const { imageUrl, qrUrl, modelUrl,title,category } = req.body;
     const userId = req.user.id;
 
     if (!imageUrl || !qrUrl || !modelUrl) {
@@ -14,6 +14,8 @@ export const saveModelinDB = async (req, res) => {
       qrUrl,
       modelUrl,
       userId,
+      title,
+      category
     });
 
     await newEntry.save();
