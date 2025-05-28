@@ -23,6 +23,10 @@ const ModelSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    favourite:{
+      type: Boolean,
+      default: false
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

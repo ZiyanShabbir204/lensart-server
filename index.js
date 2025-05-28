@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import userRoutes from "./routes/userRoutes.js";
 import modelRoutes from "./routes/modelRoutes.js";
 import cookieParser from "cookie-parser";
+import { isAdminLoggedIn } from "./middleware/auth.js";
 
 dotenv.config();
 const app = express();
@@ -20,7 +21,7 @@ connectDB();
 
 //user Routes
 app.use("/api", userRoutes);
-app.use("/api", modelRoutes);
+app.use("/api/model",isAdminLoggedIn, modelRoutes);
 app.get("/check-me", (_, res) => {
   res.json({ message: `Hello World!` });
 });

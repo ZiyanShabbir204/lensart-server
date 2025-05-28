@@ -1,3 +1,5 @@
+import mongoose, { Mongoose } from "mongoose";
+import Favourite from "../models/Favourite.js";
 import Model from "../models/Model.js";
 
 export const saveModelinDB = async (req, res) => {
@@ -21,7 +23,7 @@ export const saveModelinDB = async (req, res) => {
     await newEntry.save();
 
     res
-      .status(201)
+      .status(200)
       .json({ message: "Data added successfully.", data: newEntry });
   } catch (error) {
     console.error(error);
@@ -32,8 +34,21 @@ export const saveModelinDB = async (req, res) => {
 export const getUserModels = async (req, res) => {
   try {
     const userId = req.user.id;
+    const {limit,category,title,favourite} = req.query
 
-    const userModels = await Model.find({ userId });
+    let query = {userId}
+
+    if(category){
+      query.category = category
+    }
+    if(title){
+      query.title = {$regex : title , $options:'i'}
+    }
+    if(favourite){
+      query.favourite = favourite
+    }
+
+    const userModels = await Model.find(query).limit(limit).sort({createdAt: -1})
 
     res.status(200).json({ data: userModels });
   } catch (error) {
@@ -61,3 +76,71 @@ export const getModelById = async (req, res) => {
     res.status(500).json({ message: "Server error while fetching model." });
   }
 };
+
+export const addFavourite = async(req,res) =>{
+  try {
+    const {modelId} = req.body
+    const userId = req.user.id
+
+    const favourite = new Favourite({
+      userId,
+      modelId
+    })
+    await favourite.save()
+    await Model.findByIdAndUpdate({_id:modelId},{favourite:true})
+
+    res
+      .status(200)
+      .json({ message: "favourite added successfully.", data: favourite });
+
+  } catch (error) {
+    console.log("error", error)
+
+    res.status(500).json({ message: error });
+
+  }
+}
+
+export const getAllFavourite = async(req,res)=>{
+  try {
+    const userId = req.user.id
+    const favourites = await Favourite.find({userId}).populate("modelId")
+    res
+    .status(201)
+    .json({ data: favourites });
+
+    
+  } catch (error) {
+    console.log("error",error)
+    res.status(500).json({ message: "Server error." });
+
+  }
+}
+
+export const deleteModel =  async (req, res) =>{
+  try {
+    const {modelId} = req.query
+    const model = await Model.findByIdAndDelete({_id:modelId})
+
+    res.status(200).json({message:"Deleted successfully", data: model });
+
+  } catch (error) {
+    res.status(500).json({ message: "Server error." });
+
+  }
+}
+
+export const removeFavourite = async (req,res) =>{
+  try {
+    const {modelId} = req.query
+    console.log("model Id", modelId)
+    await Model.findByIdAndUpdate({_id:modelId},{favourite:false})
+    const favourite = await Favourite.findOneAndDelete({modelId})
+
+    res.status(200).json({message:"Deleted successfully"});
+
+  } catch (error) {
+    res.status(500).json({ message: "Server error." });
+
+  }
+}
